@@ -1,0 +1,76 @@
+<html>
+<head><title>SKYEDIT documentation</title></head>
+<body>
+<p style="font-size: 1.5em; color: #ff0000;">SkyEdit 0.1</p>
+<p>Congratulations! You have successfully acquired SkyEdit, a level editor for the DOS classic SkyRoads! This isn't a DOS program however. This program was designed and compiled to run (at least) in Windows 7. There might be some bugs (although I haven't encountered any) so run at your own risk.</p>
+<p style="font-size: 1.2em; color: #0000dd;">Starting Up!</p>
+<p>As the editor starts, it tries to load the file ROADS.LZS, which contains the SkyRoads levels. If the file doesn't exist in the folder, you can start with a completely empty road pack! Which might be for the best, see &quot;Making Roads&quot;. If the editor doesn't start, make sure you have SDL.dll and skyedit.bmp in your folder (they are included in the skyedit01.zip).</p>
+<p style="font-size: 1.2em; color: #0000dd;">Command Keys</p>
+<p>SkyEdit has different modes, which practically means different screens for doing different things. There is no mouse support. If you don't understand something, try it out, the editor is easy to use (I don't feel like writing this help, sorry). Shift in the context of keys means left shift of the keyboard, the key under caps lock in most keyboards.</p>
+<p><b>Road editor</b>: the main mode, where level tiles/blocks are placed<br />
+Arrows - move cursor around<br />
+Q - cycle current block left<br />
+W - cycle current block right<br />
+Shift + Q - cycle current block's second attribute left<br />
+Shift + W - cycle current block's second attribute right<br />
+C - set the block under cursor to the current block variable<br />
+Shift + C - copy current row<br />
+Space - replace the block under curson with the current block<br />
+Shift + Space - replace current row with the copied row<br />
+1 - set current block to feature a round tunnel<br />
+2 - set current block to feature a half-height solid obstacle<br />
+3 - set current block to feature a half-height solid obstacle with a tunnel<br />
+4 - set current block to feature a full-height solid obstacle<br />
+5 - set current block to feature a full-height solid obstacle with a tunnel<br />
+6 - set current block to feature nothing<br />
+PageUp - move up one screen<br />
+PageDown - move down one screen<br />
+Shift + PageUp - insert a new empty row and move everything (including the current row) one row up<br />
+Shift + PageDown - insert a new empty row and move everything (including the current row) one row down<br />
+Home - move to the end of the road<br />
+End - move to the very beginning of the road<br />
+Shift + Delete - remove current row<br />
+Shift + F5 - save current level in memory<br />
+F6 - open load level mode<br />
+Shift + F8 - save/export all the levels in memory to the ROADS.LZS file<br />
+F10 - open color editor mode<br />
+F11 - open variable editor mode
+</p>
+<p><b>Color editor</b>: for editing the colors seen in the level<br />
+Q and W - choose the block or the other two elements<br />
+A and S - choose the surface of the chosen block or element<br />
+Arrow Up and Arrow Down - choose R or G or B<br />
+Z and X - decrease or increase the currently selected R or G or B shade<br />
+Shift + Z and Shift + X - decrease or increase the above by 5 instead of 1<br />
+C - copy current RGB<br />
+V - paste copied RGB<br />
+Shift + C - copy colors of all surfaces of chosen block or element<br />
+Shift + V - paste all the surfaces<br />
+Return/Enter - if a block is selected, set it to current block variable, return to road editor<br />
+Esc and F9 - back to road editor mode
+</p>
+<p><b>Variable editor</b>: where level variables gravity, fuel, and oxygen are set<br />
+Arrow Up and Arrow Down - move up or down<br />
+Arrow Left and Arrow Right - decrease or increase chosen variable<br />
+Shift + Arrow Left and Shift + Arrow Right - decrease or increase chosen variable by 10 instead of 1<br />
+Esc and F9 - back to road editor mode
+</p>
+<p><b>Load level mode</b>: select level to load (from memory)<br />
+Arrows - move cursor around<br />
+Return/Enter - load chosen level<br />
+Esc and F9 - back to road editor mode
+</p>
+<p style="font-size: 1.2em; color: #0000dd;">Notes</p>
+<p>If you save current level (Shift + F5) or load a level (F6), the data that is read/written is in memory. ROADS.LZS won't be affected until you build the file (Shift + F8). If you don't save the current level in memory before opening a level, all the changes in the level will be lost.</p>
+<p>In the game, the player starts in the middle of row 3 (0,1,2,3...) in every level. This position is displayed by the editor with a start point icon.</p>
+<p>To make the level have an exit, place one or more tunnel on the very last row of the level. The game recognizes these as exits if the player drives through them.</p>
+<p>If you're running SkyRoads in DosBox and testing your level, you can save time by quitting the level in game, creating a new ROADS.LZS in the editor, copying the file to the game's directory (unless you already work there), then selecting the level again in the game and see the changed result, instead of quitting DosBox every time and starting it again whenever you change something. SkyRoads loads the level data from ROADS.LZS whenever the player enters the level from the level menu.</p>
+<p style="font-size: 1.2em; color: #0000dd;">Making Roads</p>
+<p>Note that this version (0.1) of SkyEdit doesn't feature complicated compression of level data. That means that it's unlikely that you can make all levels full levels and fit the data into a 64k file, which is the maximum size of ROADS.LZS. This also means that if you open the original ROADS.LZS, you cannot save it again in this editor, unless you remove a couple of levels. Sorry about this inconvenience -- but you can always make your own level editor featuring a proper compression routine. Anyway, you should still be able to make a decent collection of roads, the space doesn't run out all that easily!</p>
+<p style="font-size: 1.2em; color: #0000dd;">What about world backgrounds?</p>
+<p>I made a small tool for changing those too, it's called SkyImg and can be found online, probably via ModdingWiki, so check that out (linked below).</p>
+<p style="font-size: 1.2em; color: #0000dd;">Credits</p>
+<p>This level editor was designed and programmed by KeenRush. Thanks to Malvineous for some vital help, mostly with problems I had with uncompression and compression routines. ModdingWiki came in handy for some things, even if most of the level format was not documented yet and I had to figure it out on my own.</p>
+<p>You can find the SkyRoads page on ModdingWiki <a href="http://www.shikadi.net/moddingwiki/SkyRoads">here</a>. If you make some levels, let me know, e-mail me to keenrush314@hotmail.com -- you can also e-mail your comments about the editor or report a bug, although it's very unlikely I'll get around fixing anything. But levels would be cool to see.</p>
+</body>
+</html>
