@@ -1,7 +1,7 @@
 <!doctype html>
 <html lang="en">
 <head>
-    <title>Keyboard Input</title>
+    <title>Skyroads</title>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
     <link rel=stylesheet href="css/base.css"/>
@@ -29,6 +29,8 @@ var levels = [];
 var loadedLevelNum = -1;
 var level = null;
 var levelDistance = 0;
+var oxygen = 0;
+var fuel = 0;
 
 var roadWidth = 50;
 var roadLength = 500;
@@ -37,6 +39,8 @@ var topHeight = 50;
 var roadCenter = 80;
 var roadBottom = 10;
 var shipHeight = 30;
+
+var finished = false;
 
 var geometry = new THREE.CubeGeometry( roadWidth, roadHeight, roadLength );
 var material = new THREE.MeshLambertMaterial( { color: 0xFF00ff } );
@@ -115,19 +119,19 @@ function renderLevel(loadedLevel) {
 			var relative = ((3 - (j / 2)) * roadCenter);
 			if (bottomblockcolor) {
 				var mesh = new THREE.Mesh( geometry, material );
-				mesh.position.set(relative,roadBottom,i / 14 * -roadLength + 200);
+				mesh.position.set(relative,roadBottom,i / 14 * roadLength + 200);
 				scene.add(mesh);
 				levelParts.push(mesh);
 			}
 			if (topblockcolor) {
 				var mesh = new THREE.Mesh( topGeometry, topMaterial );
-				mesh.position.set(relative,roadBottom + roadHeight / 2 + topHeight / 2,i / 14 * -roadLength + 200);
+				mesh.position.set(relative,roadBottom + roadHeight / 2 + topHeight / 2,i / 14 * roadLength + 200);
 				scene.add(mesh);
 				levelParts.push(mesh);
 			}
 			if (modifiers&1) {
 				var mesh = new THREE.Mesh( tunnelGeometry, tunnelMaterial );
-				mesh.position.set(relative,roadBottom + roadHeight / 2 + topHeight / 2,i / 14 * -roadLength + 200);
+				mesh.position.set(relative,roadBottom + roadHeight / 2 + topHeight / 2,i / 14 * roadLength + 200);
 				scene.add(mesh);
 				levelParts.push(mesh);
 			}
@@ -264,10 +268,14 @@ function init()
 function reset() {
 	mesh.position.set(0,shipHeight,0);
 	target.set(0,shipHeight,0);
-	camera.position.set(0,100,300);
-	light.position.set(0,300,300);
+	camera.position.set(0,100,-300);
+	light.position.set(0,300,-300);
 	velocity.set(0,0,0);
 	set("msg", "");
+	set("detail", "");
+	oxygen = level.oxygen;
+	fuel = level.fuel;
+	finished = false;
 }
 
 function animate() 
@@ -286,48 +294,67 @@ function update()
 
 	var moveDistance = 100 * clock.getDelta();
 
-	if (level) {
-		velocity.y -= level.gravity * 2000 * clock.getDelta();
+	if (level && mesh.position.y > shipHeight) {
+		velocity.y -= level.gravity * 3 * (clock.getDelta() * 1000);
 		// if (velocity.y < 0)
 			// velocity.y = 0;
 	}
 
 	if ( keyboard.down("left") || keyboard.down("A") ) 
-		mesh.translateX( -roadCenter );
+		mesh.translateX( roadCenter );
 		
 	if ( keyboard.down("right") || keyboard.down("D")) 
-		mesh.translateX(  roadCenter );
+		mesh.translateX(  -roadCenter );
 
 	if ( keyboard.pressed("up") ) {
-		velocity.z -= moveDistance; //var dist = -moveDistance * 50;
+		velocity.z += moveDistance; //var dist = -moveDistance * 50;
 		// mesh.translateZ( dist );
 	}
 		
 	if ( keyboard.pressed("down") )
-		velocity.z += moveDistance; 
+		velocity.z -= moveDistance; 
 		// mesh.translateZ(  moveDistance * 50);
 
-	if ( keyboard.pressed("space") && mesh.position.y < shipHeight * 1.1) {
+	if ( keyboard.pressed("space") && mesh.position.y < shipHeight * 1.2) {
 		// mesh.translateY(  moveDistance * 10 )
-		velocity.y = level.gravity * 3000 * clock.getDelta();
+		velocity.y = level.gravity / 2;
 	}
 		
-	if ( keyboard.down("R") )
+	if ( keyboard.down("R") ) 
 		mesh.material.color = new THREE.Color(0xff0000);
 	if ( keyboard.up("R") )
 		mesh.material.color = new THREE.Color(0x0000ff);
 
-	if (keyboard.down("ESC"))
+	if (keyboard.down("esc"))
 		reset();
 
-	if (velocity.z > -10)
-		velocity.z = -10;
+	if (velocity.z < 10)
+		velocity.z = 10;
 
-	if (mesh.position.z < -levelDistance + roadLength) {
-		velocity.set(0,0,0);
-		set("msg", "FINISHED!");
+	if (!finished) {
+		fuel -= velocity.z / roadLength;
+		oxygen -= clock.getDelta() * 10000;
 	}
 
+	if (fuel < 0)
+		fuel = 0;
+	if (oxygen < 0)
+		oxygen = 0;
+
+	set("fuel", "Fuel " + Math.ceil(fuel));
+	set("oxygen", "Oxygen " + Math.ceil(oxygen));
+
+	if (mesh.position.z >= levelDistance) {
+		velocity.set(0,0,0);
+		set("msg", "FINISHED!");
+		set("detail", "You reached the end!");
+		finished = true;
+	} else if (!fuel || !oxygen) {
+		velocity.set(0,0,0);
+		set("msg", "FAILED!");
+		set("detail", !fuel?"Out of fuel":"Out of oxygen");
+		finished = true;
+	}
 
 	mesh.translateX(velocity.x);
 	mesh.translateY(velocity.y);
@@ -337,10 +364,10 @@ function update()
 		mesh.position.setY(shipHeight);
 		velocity.y = -velocity.y / 3;
 	}
-	set("speed", "Speed " + (-velocity.z.toFixed(1)));
+	set("speed", "Speed " + (velocity.z.toFixed(1)));
 		
 	target.z = mesh.position.z;
-	camera.position.setZ( target.z+400 );
+	camera.position.setZ( target.z-400 );
 	camera.lookAt(target);
 	light.position.setZ( camera.position.z );
 	// controls.update();
@@ -393,5 +420,6 @@ function render()
 </div>
 
 <div id="msg" style="position:absolute; top: 100px; width:100%;text-align:center;font-size:3em;"></div>
+<div id="detail" style="position:absolute; top: 160px; width:100%;text-align:center;font-size:0.8em;"></div>
 </body>
 </html>
